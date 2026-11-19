@@ -1,0 +1,19 @@
+# Render Blueprint: Render reads this file to create the service.
+# Deploy: Render dashboard > New > Blueprint > pick this GitHub repo.
+services:
+  - type: web
+    name: remote-airports-wx
+    runtime: python
+    plan: starter              # paid, always on. The free plan sleeps when idle and cannot keep wx.db.
+    region: ohio               # closest Render region to Ontario
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 server.py
+    healthCheckPath: /api/latest
+    autoDeploy: true           # redeploy whenever you push to GitHub
+    envVars:
+      - key: DB_PATH
+        value: /data/wx.db     # keep the database on the persistent disk below
+    disk:
+      name: wx-data
+      mountPath: /data
+      sizeGB: 1
